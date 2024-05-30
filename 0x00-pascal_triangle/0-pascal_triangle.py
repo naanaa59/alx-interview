@@ -1,4 +1,4 @@
-#!usr/bin/python3
+#!/usr/bin/python3
 """ This script define a function named pascal_triangle that
 build up and return n rows of a pascal's triangle represented by
 list of lists"""

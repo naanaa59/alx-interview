@@ -23,7 +23,7 @@ def print_metrics():
 def handler(signum, frame):
     """ signal handler"""
     print_metrics()
-    raise KeyboardInterrupt
+    # raise KeyboardInterrupt
 
 
 signal(SIGINT, handler)
@@ -34,13 +34,14 @@ try:
         # print(line.strip())
         status_size = re.findall(r'\d+', line.split('"')[2])
         status_code, file_size = status_size[0], status_size[1]
+        # print(status_code, file_size)
         if status_code and file_size:
             # print("///")
             lines_count += 1
-        for status in status_codes:
-            if status == int(status_code):
-                status_dict[status] += 1
-                total_size += int(file_size)
+            for status in status_codes:
+                if status == int(status_code):
+                    status_dict[status] += 1
+                    total_size += int(file_size)
         if lines_count % 10 == 0:
             print_metrics()
             total_size = 0

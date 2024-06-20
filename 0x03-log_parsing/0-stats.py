@@ -32,26 +32,20 @@ signal(SIGINT, handler)
 try:
     for line in sys.stdin:
         try:
+            print(line.strip())
             parts = line.split()
-            ip_address = parts[0]
-            date = parts[3] + " " + parts[4]
-            request = parts[5] + " " + parts[6] + " " + parts[7]
-            status_code = int(parts[8])
-            file_size = int(parts[9])
-
+            status_code, file_size = int(parts[-2]), int(parts[-1])
+            # print(status_code, file_size)
+            # print("///")
             if status_code in status_dict:
-                total_size += file_size
+                # print("///")
                 status_dict[status_code] += 1
-
+                total_size += file_size
             lines_count += 1
-
             if lines_count % 10 == 0:
                 print_metrics()
-
         except (IndexError, ValueError):
-            # Skip lines with incorrect format
             continue
-
 except KeyboardInterrupt:
     print_metrics()
     sys.exit(0)

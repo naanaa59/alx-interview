@@ -23,7 +23,7 @@ def print_metrics():
 def handler(signum, frame):
     """ signal handler"""
     print_metrics()
-    # raise KeyboardInterrupt
+    sys.exit(0)
 
 
 signal(SIGINT, handler)
@@ -31,20 +31,27 @@ signal(SIGINT, handler)
 
 try:
     for line in sys.stdin:
-        # print(line.strip())
-        status_size = re.findall(r'\d+', line.split('"')[2])
-        status_code, file_size = status_size[0], status_size[1]
-        # print(status_code, file_size)
-        if status_code and file_size:
-            # print("///")
+        try:
+            parts = line.split()
+            ip_address = parts[0]
+            date = parts[3] + " " + parts[4]
+            request = parts[5] + " " + parts[6] + " " + parts[7]
+            status_code = int(parts[8])
+            file_size = int(parts[9])
+
+            if status_code in status_dict:
+                total_size += file_size
+                status_dict[status_code] += 1
+
             lines_count += 1
-            for status in status_codes:
-                if status == int(status_code):
-                    status_dict[status] += 1
-                    total_size += int(file_size)
-        if lines_count % 10 == 0:
-            print_metrics()
-            total_size = 0
-            status_dict = {code: 0 for code in status_codes}
-except Exception as e:
-    pass
+
+            if lines_count % 10 == 0:
+                print_metrics()
+
+        except (IndexError, ValueError):
+            # Skip lines with incorrect format
+            continue
+
+except KeyboardInterrupt:
+    print_metrics()
+    sys.exit(0)

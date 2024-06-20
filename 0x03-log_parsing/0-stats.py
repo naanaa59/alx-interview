@@ -1,37 +1,53 @@
 #!/usr/bin/python3
-'''A script that reads stdin line by line and computes metrics'''
-
+"""reads stdin line by line and computes metrics"""
 
 import sys
+import os
+import re
+from signal import signal, SIGINT, pause
 
-cache = {'200': 0, '301': 0, '400': 0, '401': 0,
-         '403': 0, '404': 0, '405': 0, '500': 0}
+
+lines_count = 0
+status_codes = [200, 301, 400, 401, 403, 404, 405, 500]
 total_size = 0
-counter = 0
+status_dict = {code: 0 for code in status_codes}
 
-try:
-    for line in sys.stdin:
-        line_list = line.split(" ")
-        if len(line_list) > 4:
-            code = line_list[-2]
-            size = int(line_list[-1])
-            if code in cache.keys():
-                cache[code] += 1
-            total_size += size
-            counter += 1
 
-        if counter == 10:
-            counter = 0
-            print('File size: {}'.format(total_size))
-            for key, value in sorted(cache.items()):
-                if value != 0:
-                    print('{}: {}'.format(key, value))
+def handler(signum, frame):
+    print_metrics(total_size, status_dict)
+    raise KeyboardInterrupt
 
-except Exception as err:
-    pass
 
-finally:
-    print('File size: {}'.format(total_size))
-    for key, value in sorted(cache.items()):
-        if value != 0:
-            print('{}: {}'.format(key, value))
+signal(SIGINT, handler)
+
+
+def print_metrics(size, dict):
+    """ print method"""
+    print(f"File size: {size}")
+    for code, count in sorted(dict.items()):
+        if count > 0:
+            print(f"{code}: {count}")
+
+
+while True:
+    try:
+        line = sys.stdin.readline()
+        if not line:
+            print("no lines")
+            break
+        # print(line.strip())
+        status_size = re.findall(r'\d+', line.split('"')[2])
+        status_code, file_size = status_size[0], status_size[1]
+        lines_count += 1
+    except Exception as e:
+        pass
+    finally:
+        for status in status_codes:
+            if status == int(status_code):
+                status_dict[status] += 1
+                total_size += int(file_size)
+
+        if lines_count % 10 == 0:
+            print_metrics(total_size, status_dict)
+            total_size = 0
+            status_dict = {code: 0 for code in status_codes}

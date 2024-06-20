@@ -13,41 +13,29 @@ total_size = 0
 status_dict = {code: 0 for code in status_codes}
 
 
-def handler(signum, frame):
-    print_metrics(total_size, status_dict)
-    raise KeyboardInterrupt
-
-
-signal(SIGINT, handler)
-
-
-def print_metrics(size, dict):
+def print_metrics(size, dicti):
     """ print method"""
     print(f"File size: {size}")
-    for code, count in sorted(dict.items()):
+    for code, count in sorted(dicti.items()):
         if count > 0:
             print(f"{code}: {count}")
 
 
-while True:
-    try:
-        line = sys.stdin.readline()
-        if not line:
-            print("no lines")
-            break
+try:
+    for line in sys.stdin:
         # print(line.strip())
         status_size = re.findall(r'\d+', line.split('"')[2])
         status_code, file_size = status_size[0], status_size[1]
-        lines_count += 1
-    except Exception as e:
-        pass
-    finally:
+        if status_code and file_size:
+            # print("///")
+            lines_count += 1
         for status in status_codes:
             if status == int(status_code):
                 status_dict[status] += 1
                 total_size += int(file_size)
-
         if lines_count % 10 == 0:
             print_metrics(total_size, status_dict)
-            total_size = 0
-            status_dict = {code: 0 for code in status_codes}
+except Exception as e:
+    pass
+finally:
+    print_metrics(total_size, status_dict)

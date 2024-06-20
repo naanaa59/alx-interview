@@ -32,7 +32,7 @@ signal(SIGINT, handler)
 try:
     for line in sys.stdin:
         try:
-            print(line.strip())
+            # print(line.strip())
             parts = line.split()
             status_code, file_size = int(parts[-2]), int(parts[-1])
             # print(status_code, file_size)

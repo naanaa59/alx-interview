@@ -2,7 +2,6 @@
 """reads stdin line by line and computes metrics"""
 
 import sys
-import os
 import re
 from signal import signal, SIGINT
 
@@ -44,5 +43,7 @@ try:
                 total_size += int(file_size)
         if lines_count % 10 == 0:
             print_metrics()
+            total_size = 0
+            status_dict = {code: 0 for code in status_codes}
 except Exception as e:
     pass

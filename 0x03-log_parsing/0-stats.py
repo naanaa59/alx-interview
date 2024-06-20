@@ -27,8 +27,9 @@ while True:
                 total_size += int(file_size)
         if lines_count == 10:
             print(f"File size: {total_size}")
-            for code, rep in sorted(status_dict.items()):
-                print(f"{code}: {rep}")
+            for code, count in sorted(status_dict.items()):
+                if count > 0:
+                    print(f"{code}: {count}")
             lines_count = 0
             total_size = 0
             status_dict = {key: 0 for key in status_codes}
